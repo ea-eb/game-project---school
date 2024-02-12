@@ -1,0 +1,18 @@
+borisjohnson.sprite - used for idle when the player is not moving and when the player is moving in the x axis and when the player
+is moving right
+
+borisjohnson.sprite_mr: mr is move right sprite files for this:
+first sprite for this: borisjohnson.sprite_mr1
+second sprite for this: borisjohnson.sprite_mr2
+third sprite for this: borisjohnson.sprite_mr3
+borisjohnson.sprite - used for idle when the player is not moving and when the player stops moving right
+
+
+
+
+borisjohnson.sprite_ml: ml is move left sprite files for this:
+first sprite for this: borisjohnson.sprite_ml1
+second sprite for this: borisjohnson.sprite_ml2
+third sprite for this: borisjohnson.sprite_ml3
+file for boris to be idle after moving left: borisidle.leftsprite
+

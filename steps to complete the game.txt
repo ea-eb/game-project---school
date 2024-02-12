@@ -1,0 +1,66 @@
+finish the enemy attack sprites - need to finish by 22/01/24 - to complete this create a collision box for player sprite 
+and enemy sprites - fail 22/01/24 at 18:46 continue later on.
+
+finish final map design for level 1 = done 22/01/24 = may be used for every other level or tiles will be changed
+
+implement the enemy spirte attack animations for them to attack when they are near the player
+after that has been implemented implement the playing state of the game where the game starts the player can collect items(pints,
+pport, power ups) and the enemy attacks. - finish by 22/23 jan 2024 - started at 18:47
+do map design for level 1 = 22/1/24 - finish by - done
+then implement beer + power up sprites
+need to add collision boundary for bush by 23/1/24
+
+Once that has been implemented make the hud of the game with the timer, score count, level count, start and end of the game etc
+timer done - 22/01/24
+Playing state done - 22/01/24
+
+Once that has been implemented add the health for the player enemies and health of the game and winning the game and losing the
+game and winning/dying
+
+Add collision detection for player and enemy sprite to make them both lose health
+
+after that implement the features of the power - ups being able to be activated in the game and by the controls of the player
+
+after the player is able to use the power ups cause the enemies to lose health.
+
+When the level 1 is complete the implementation of the next 2 levels and the other map designs and increase difficulties 
+of the next level
+
+After playing state is done check if win/lose for the game works
+
+make the leadboard count everytime the game is played
+
+^ all target made on 19/1/24
+
+
+
+
+Side steps for game on 7/2/24:
+Implment HUD, Win/Lose for the game, player and enemy lose, health, how to proceed to the next level, collection of coins(pints)
+and key (passport), 3 levels, player use of power ups, enemy attacks and player attack, player and enemy die, bombs and enemy 
+cause loss of health to player, use of power - ups to use for player and cause loss of health of enemy,  
+
+DO THE PLAYABLILTY OF THE GAME THEN THE HUD
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
