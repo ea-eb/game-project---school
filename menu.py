@@ -1,7 +1,7 @@
 from data_types import State
 import pygame
 import constants
-
+import utils
 
 class Button:
     
@@ -52,13 +52,22 @@ class Menu:
             - screen_height - used for centering the text (Y axis)
         """
 
+        self.screen_width = screen_width
+        self.screen_height = screen_height
+
         self.__screen = screen
-        # Load the images that we need for the menu
         
-        # Game text
-        font = pygame.font.SysFont("arialblack", 58)
-        self.text = font.render("Tory Tangle",True, constants.COLORS["text"])
-        self.text_rect = self.text.get_rect(center=(screen_width // 2, 50))
+        # Fonts
+        self.title_font = pygame.font.SysFont("arialblack", 58)
+        
+        # Load the images that we need for the menu
+        self.game_font = pygame.font.SysFont("arialblack", 40)
+        self.title_text = self.title_font.render("Tory Tangle",True, constants.COLORS["text"])
+        self.title_text_rect = self.title_text.get_rect(center=(screen_width // 2, 50))
+
+        # Back button
+        self.back_text = self.title_font.render("Back", True, constants.COLORS["text"])
+        self.back_rect = self.back_text.get_rect(center=(self.screen_width * 0.12, self.screen_height * 0.05))
 
         # Menu background image
         self.background_image = pygame.image.load(paths["background"]).convert_alpha()
@@ -76,6 +85,11 @@ class Menu:
         position = (screen_width // 2, screen_height // 1.75 + 210)
         self.quit_game_button = Button(paths["quit_game_button"], position, screen)
 
+        self.__high_score_path = paths["high_score"]
+
+        self.state = State.NOTHING
+    
+
     
     def interaction(self, mouse_pos: tuple[int, int]) -> State:
         """
@@ -88,33 +102,90 @@ class Menu:
             - state - return the game state which is needed in the main game loop
         """
 
-        state = State.NOTHING
-
         if self.play_game_button.is_clicked(mouse_pos):
-            state = State.GAME
+            self.state = State.GAME
 
-        if self.high_score_button.is_clicked(mouse_pos):
-            state = State.HIGH_SCORE
+        elif self.high_score_button.is_clicked(mouse_pos):
+            self.state = State.HIGH_SCORE
 
-        if self.quit_game_button.is_clicked(mouse_pos):
-            state = State.QUIT
+        elif self.quit_game_button.is_clicked(mouse_pos):
+            self.state = State.QUIT
             
-        if self.controls_button.is_clicked(mouse_pos):
-            state = State.CONTROLS
+        elif self.controls_button.is_clicked(mouse_pos):
+            self.state = State.CONTROLS
+        
+        return self.state
+ 
 
-        return state
+        
+    def draw(self, lives: float, timer: int, coins: int, level: int):
+        """
+        Draw the GUI - menu, high score and controls
+        """
 
+        if self.state == State.NOTHING:
+            self.__screen.blit(self.background_image, (0, 0))      
+            self.__screen.blit(self.title_text, self.title_text_rect)
+            
+            self.controls_button.draw()
+            self.high_score_button.draw()
+            self.play_game_button.draw()
+            self.quit_game_button.draw()
+
+        elif self.state == State.GAME:
+            lives_text = self.game_font.render(f"Lives: {lives}",True, constants.COLORS["text"])
+            lives_rect = lives_text.get_rect(center=(self.screen_width * 0.15, self.screen_height * 0.95))
+
+            minutes = timer // 60
+            seconds = timer % 60
+            timer_text = self.game_font.render("{:02}:{:02}".format(minutes, seconds), True, constants.COLORS["text"])
+            timer_rect = timer_text.get_rect(center=(self.screen_width * 0.9, self.screen_height * 0.05))
+            
+            coins_text = self.game_font.render("{:02}".format(coins),True, constants.COLORS["text"])
+            coins_rect = coins_text.get_rect(center=(self.screen_width * 0.07, self.screen_height * 0.05))
+
+            level_text = self.game_font.render(f"Level {level + 1}", True, constants.COLORS["text"])
+            level_rect = level_text.get_rect(center=(self.screen_width * 0.85, self.screen_height * 0.94))
+
+            self.__screen.blit(lives_text, lives_rect)
+            self.__screen.blit(timer_text, timer_rect)
+            self.__screen.blit(coins_text, coins_rect)
+            self.__screen.blit(level_text, level_rect)
+
+        elif self.state == State.HIGH_SCORE:
+
+            high_score = utils.load_high_socre(self.__high_score_path)
+            text = f"Highest score: {high_score}" if high_score else "No high score found"
+
+            high_score_text = self.title_font.render(text, True, constants.COLORS["text"])
+            high_score_text_rect = high_score_text.get_rect(center=(self.screen_width * 0.5, self.screen_height * 0.5))
+
+            self.__screen.blit(high_score_text, high_score_text_rect)
         
+        elif self.state == State.CONTROLS:
+            move_left_text = self.game_font.render(f"Move left: A", True, constants.COLORS["text"])
+            move_left_rect = move_left_text.get_rect(center=(self.screen_width * 0.5, self.screen_height * 0.3))
+
+            move_right_text = self.game_font.render(f"Move right: D", True, constants.COLORS["text"])
+            move_right_rect = move_right_text.get_rect(center=(self.screen_width * 0.5, self.screen_height * 0.4))
+
+            move_up_text = self.game_font.render(f"Move up: W", True, constants.COLORS["text"])
+            move_up_rect = move_up_text.get_rect(center=(self.screen_width * 0.5, self.screen_height * 0.5))
+
+            move_down_text = self.game_font.render(f"Move down: S", True, constants.COLORS["text"])
+            move_down_rect = move_down_text.get_rect(center=(self.screen_width * 0.5, self.screen_height * 0.6))
+            
+            self.__screen.blit(move_left_text, move_left_rect)
+            self.__screen.blit(move_right_text, move_right_rect)
+            self.__screen.blit(move_up_text, move_up_rect)
+            self.__screen.blit(move_down_text, move_down_rect)
+
+        if self.state in [State.CONTROLS, State.HIGH_SCORE]:
+            self.__screen.blit(self.back_text, self.back_rect)
+
+
+
+    def back_button(self, mouse_pos: tuple[int, int]):
         
-        
-    def draw(self):
-        """
-        Draw the menu on the screen
-        """
-        self.__screen.blit(self.background_image, (0, 0))      
-        self.__screen.blit(self.text, self.text_rect)
-        
-        self.controls_button.draw()
-        self.high_score_button.draw()
-        self.play_game_button.draw()
-        self.quit_game_button.draw() 
+        if self.back_rect.collidepoint(mouse_pos):
+            self.state = State.NOTHING

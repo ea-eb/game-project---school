@@ -8,11 +8,10 @@ To do:
     - @property - https://www.youtube.com/watch?v=jCzT9XFZ5bw
 """
 
-# Import the custom written modules for the gamer
+# Import the custom written modules for the game
 from menu import Menu
+from game.gameplay import Gameplay
 from data_types import State
-from game.character import Player, Enemy
-from game.map import Map
 
 # Main file that runs the game
 import constants
@@ -29,60 +28,54 @@ pygame.display.set_caption("Tory Tangle")
 # define clock to set the refresh rate of the screen
 clock = pygame.time.Clock()
 
+TIMER_EVENT = pygame.USEREVENT + 1
+pygame.time.set_timer(TIMER_EVENT, 1000)  # Fire event every second
+
 game_menu = Menu(constants.PATHS["menu"], screen)
+gameplay = Gameplay(constants.GAME_WORLDS, constants.PATHS, screen)
 
-# Initial game state
-state = State.NOTHING
-
-bo_jo = Player(constants.PATHS["player"], screen, 3)
-
-# wojak = Enemy(constants.PATHS["enemy_1"], screen, x_pos = 300, y_pos = 300, follow_threshold=100)
-
-
-map_data = [
-        [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
-        [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
-        [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
-        [None, None, None, None, None, None, None, None, None, "bush", None, None, None, None, None],
-        [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
-        [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
-        [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
-        [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
-        [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
-        [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
-        [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
-        [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
-        [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
-        [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
-        [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
-    ]
-
-my_map = Map(constants.PATHS["map"], map_data, screen)
-my_map.create()
+timer = constants.GAME_TIME
 
 # Run the code forever
 while True:
 
-    screen.fill((0, 0, 0))
+    screen.fill(constants.COLORS["background"])
+    mouse_pos = pygame.mouse.get_pos()
 
     for event in pygame.event.get():
         
-        if event.type == pygame.QUIT:
+        if event.type == pygame.QUIT or game_menu.state == State.QUIT:
             pygame.quit()
             sys.exit()
+        
+        elif event.type == TIMER_EVENT and game_menu.state == State.GAME:
+            timer -= 1 if timer > 0 else 0
 
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            mouse_pos = pygame.mouse.get_pos()
-            state = game_menu.interaction(mouse_pos)
+        if event.type == pygame.MOUSEBUTTONDOWN and game_menu.state == State.NOTHING:
+            
+            game_menu.interaction(mouse_pos)
+            
+            if game_menu.state == State.GAME:
+                timer = constants.GAME_TIME
+                gameplay = Gameplay(constants.GAME_WORLDS, constants.PATHS, screen)
+        
+        # Check if the button left button has been pressed
+        if event.type == pygame.MOUSEBUTTONDOWN and game_menu.state in [State.CONTROLS, State.HIGH_SCORE]:
+            game_menu.back_button(mouse_pos)
 
-    
-    
-    # Put map here
-    my_map.collide(bo_jo)
-    # wojak.move(bo_jo)
-    bo_jo.move()
 
+
+    if game_menu.state == State.GAME:
+        should_play = gameplay.play(timer)
+
+        if not should_play:
+            game_menu.state = State.NOTHING
+
+        if timer <= 0:
+            game_menu.state = State.NOTHING
     
+    game_menu.draw(gameplay.player.remaining_lives, timer, gameplay.coins_collected, gameplay.next_level - 1)
+
     # Update the entire screen
     pygame.display.update()
     clock.tick(constants.FPS)
